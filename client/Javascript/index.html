@@ -27,49 +27,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-      var data,data2;
       $(function () {
-        //var socket = io();
-        var socket = io.connect('http://127.0.0.1:5000');
-        var socket2 = io.connect('http://127.0.0.1:3000');
+        var socket = io.connect('http://127.0.0.1:3002');
+        var socket2 = io.connect('http://127.0.0.1:5000');
+
         $('form').submit(function(){
-          socket.emit('chat message', $('#m').val());
-          socket2.emit('chat message2', $('#m').val());
+          socket.emit('message', $('#m').val());
+          socket2.emit('message2', $('#m').val());
           $('#m').val('');
           return false;
         });
-        socket.on('chat message', function(msg){
-          if(msg.substring(0,1) == "j"){
-            data = JSON.parse(msg.substring(1));
-            msg = "<br><img src='"+data.icon_url+"'>" + data.value;
-          }else
-          if(msg.substring(0,1) == "w"){
-            data = JSON.parse(msg.substring(1));
-            msg = "The temperature is " + data.main.temp + " with " + data.weather[0].description;
-          }else if(msg.substring(0,1) == "p"){
-            msg = msg.replace(/'/g,"\"")
-            data = JSON.parse(msg.substring(1));
-            msg = "<br><img src='"+data.map+"'><br><a href='" + data.link + "'>Open Street Map</a>"
-          }
-          $('#messages').append($('<li>').html("Python: " + msg));
-        });
-        socket2.on('chat message2', function(msg){
-          if(msg.substring(0,2) == "*m"){
-            data = JSON.parse(msg.substring(1));
-            msg = "<br>";
-            for(i = 0; i < data.results.length; i++){
-              msg += "<img class='posters' src='http://image.tmdb.org/t/p/w185/" + data.results[i].poster_path + "'>"
-            }
-          }else if(msg.substring(0,2) == "*q"){
-            data = JSON.parse(msg.substring(1));
-            info = data.contents.quotes[0]
-            msg = "<br><i>" + info.quote + "</i><br> ~<b>" + info.author + "</b>"
-          }else if(msg.substring(0,2) == "*j"){
-            data2 = msg;
-            data = JSON.parse(msg.substring(1));
-            msg = data.joke
-          }
+        socket.on('message', function(msg){
           $('#messages').append($('<li>').html("NodeJS: " + msg));
+        });
+        socket2.on('message2', function(msg){
+          $('#messages').append($('<li>').html("Python: " + msg));
         });
       });
     </script>
